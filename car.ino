@@ -80,8 +80,8 @@ double SR_Read()//超声波模块测距函数
   // 测量超声波往返时间和计算距离
   Duration = pulseIn(SR_Echo, HIGH);  // 测量超声波往返时间(单位: us)
   Distance = (double)Duration * 171 / 10000; // 计算距离(单位: cm)
-  Serial.print("Distance:");
-  Serial.println(Distance);
+//  Serial.print("Distance:");
+//  Serial.println(Distance);
   return Distance;
 }
 
@@ -192,18 +192,22 @@ void line_tracking(){
     int IR_total=IR_Read();
     Serial.println(IR_total);
     switch (IR_total){
-       case 0: { DCMotor_Move(255,255); break; }   //0000
-       case 1: { DCMotor_Move(120,255); break; }   //0001
-       case 3: { DCMotor_Move(120,255); break; }   //0011
+       case 0: { DCMotor_Move(0,0); break; }   //0000
+       case 1: { DCMotor_Move(-80,255); break; }   //0001
+       case 3: { DCMotor_Move(-120,255); break; }   //0011
        case 6: { DCMotor_Move(255,255); break; }   //1001
-       case 7: { DCMotor_Move(120,255); break; }   //0111
-       case 8: { DCMotor_Move(255,120); break; }   //1000
-       case 12: { DCMotor_Move(255,255); break; }  //1100
-       case 14: { DCMotor_Move(255,120); break; }  //1110
+       case 7: { DCMotor_Move(255,255); break; }   //0111
+       case 8: { DCMotor_Move(-255,120); break; }   //1000
+       case 12: { DCMotor_Move(-255,255); break; }  //1100
+       case 14: { DCMotor_Move(255,80); break; }  //1110
+       case 16: { DCMotor_Move(0,0); break;}  //1111
        default:
           break;
     }
 }
+//DCMotor_Move(左轮，右轮);
+//左轮 -为正转 +为反转
+//右轮 +为正转 -为反转
 /****************************************循迹相关函数****************************************/
 
 /****************************************超声避障函数****************************************/
@@ -227,8 +231,5 @@ void servo_test()
 
 void loop()
 {
-    //BTControl();
-    //DCMotor_Move(255,255);
-    servo_test();
+  line_tracking();
 }
-
