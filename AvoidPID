@@ -1,0 +1,39 @@
+double DIS_Last;
+double amplitudeRestrict()
+{
+  double dis=0,disFilter=0;
+  dis=SR_Read();
+  uint8_t flag=0;
+  while(dis>1000.0)
+  {
+    dis=SR_Read();
+  }
+  while(dis<=1000.0)
+  {
+    disFilter+=dis;
+    flag++;
+    if(flag>=5)
+    {
+      disFilter=disFilter/5;
+      flag=0;
+      return disFilter;
+    }
+  }
+}
+void AvoidPID()
+{
+  static double DIS_REF=amplitudeRestrict();
+  static double DIS_Last=amplitudeRestrict();
+  SG901.write(180);
+  DIS=amplitudeRestrict();
+  px=DIS-DIS_REF;
+  pd=DIS-DIS_Last;
+  double value=px*20+pd*10;
+  printf("value=%d\nDIS=%d\n",value,DIS);
+  if(value>0)
+    DCMotor_Move(-255+(int)value,255);
+  else
+    DCMotor_Move(-255,255-(int)value);
+  DIS_Last=DIS;
+  return;
+}
