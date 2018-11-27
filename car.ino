@@ -145,14 +145,13 @@ void setup()
 }
 
 /****************************************蓝牙遥控相关函数****************************************/
-//还没有写控制设计的部分
+//还没有写控制射击的部分
 void BTControl()
 {
   uint8_t dir;
   while(1)
   {
     dir=Serial.read();
-    
    if(dir == 0x03)  //forward
     {
       Serial.println("foward");
@@ -182,6 +181,10 @@ void BTControl()
         Serial.println("stop");
         DCMotor_Move(0,0);
    }
+   if(dir == 0x01 || dir == 0x02 || dir == 0x0C || dir == 0x0D)
+   {
+    break;
+   }
    }
 }
 /****************************************蓝牙遥控相关函数****************************************/
@@ -189,9 +192,12 @@ void BTControl()
 
 /****************************************循迹相关函数****************************************/
 void line_tracking(){
+    Serial.println("I AM TRACKING!");
+    while(1)
+    {
     int IR_total=IR_Read();
-    Serial.println(IR_total);
-    switch (IR_total){
+    switch (IR_total)
+    {
        case 0: { DCMotor_Move(0,0); break; }   //0000
        case 1: { DCMotor_Move(-80,255); break; }   //0001
        case 3: { DCMotor_Move(-120,255); break; }   //0011
@@ -204,6 +210,7 @@ void line_tracking(){
        default:
           break;
     }
+    }
 }
 //DCMotor_Move(左轮，右轮);
 //左轮 -为正转 +为反转
@@ -211,9 +218,10 @@ void line_tracking(){
 /****************************************循迹相关函数****************************************/
 
 /****************************************超声避障函数****************************************/
-void servo_test()
+void Avoiding()
 {
   uint8_t angle = 0;
+  Serial.println("I AM AVOIDING!");
     for (angle = 0; angle <= 180; angle += 5) //从50°转至180°
   {
     SG901.write(angle);  // 转至指定位置
@@ -226,10 +234,32 @@ void servo_test()
     delay(50);            // 延时15s
   }
 }
-
+//现在只写了一下舵机的驱动
 /****************************************超声避障函数****************************************/
+
+
+/****************************************模式选取函数****************************************/
+void serialEvent(){
+  uint8_t mode;
+  mode = Serial.read();
+  if(mode == 0x01)
+  {
+    line_tracking();
+  }
+  if(mode == 0x0E)
+  {
+    BTControl();
+  }
+  if(mode == 0x0C)
+  {
+    Avoiding();
+  }
+}
+
+
+/****************************************模式选取函数****************************************/
+
 
 void loop()
 {
-  line_tracking();
 }
