@@ -197,18 +197,19 @@ void line_tracking(){
     Serial.println(IR_total);
     switch (IR_total)
     {
-       case 0: { DCMotor_Move(255,255); break; }   //0000
+       case 0: {DCMotor_Move(150,-150); break; }   //0000
        case 1: { DCMotor_Move(-80,255); break; }   //0001
        case 2: {DCMotor_Move(-120,255); break;} //0010
        case 3: { DCMotor_Move(-255,120); break; }   //0011
        case 4: {DCMotor_Move(-120,255); break;}  //0100
+       case 5: {DCMotor_Move(255,120); break;}  //0101
        case 6: { DCMotor_Move(-255,255); break; }   //1001
-       case 7: { DCMotor_Move(-255,0); break; }   //0111
+       case 7: { DCMotor_Move(255,255); break; }   //0111
        case 8: { DCMotor_Move(-255,120); break; }   //1000
        case 9: { DCMotor_Move(-255,255); break;}  //1001
-       case 12: { DCMotor_Move(-120,255); break; }  //1100
-       case 14: { DCMotor_Move(0,255); break; }  //1110
-       case 15: { DCMotor_Move(255,255); break;}  //1111
+       case 12: { DCMotor_Move(-255,-255); break; }  //1100
+       case 14: { DCMotor_Move(-255,-255); break; }  //1110
+       case 15: { DCMotor_Move(255,-255); break;}  //1111
        default:
           break;
     }
