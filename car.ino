@@ -27,7 +27,7 @@ int IR_Value[10] = {0};  // 定义 红外循迹模块读取值
 int IR_STA = 0;         // 定义 红外循迹状态指示符
 double SR_Distance = 0;    // 定义 超声波测量距离
 int Servo_Angle = 0;  // 定义 舵机角度位置
-
+uint8_t mode;
 
 
 /****************************************红外循迹(IR)相关函数****************************************/
@@ -194,21 +194,29 @@ void line_tracking(){
     while(1)
     {
     int IR_total=IR_Read();
+    Serial.println(IR_total);
     switch (IR_total)
     {
-       case 0: { DCMotor_Move(0,0); break; }   //0000
+       case 0: { DCMotor_Move(255,255); break; }   //0000
        case 1: { DCMotor_Move(-80,255); break; }   //0001
-       case 3: { DCMotor_Move(-120,255); break; }   //0011
-       case 6: { DCMotor_Move(255,255); break; }   //1001
-       case 7: { DCMotor_Move(255,255); break; }   //0111
+       case 2: {DCMotor_Move(-120,255); break;} //0010
+       case 3: { DCMotor_Move(-255,120); break; }   //0011
+       case 4: {DCMotor_Move(-120,255); break;}  //0100
+       case 6: { DCMotor_Move(-255,255); break; }   //1001
+       case 7: { DCMotor_Move(-255,0); break; }   //0111
        case 8: { DCMotor_Move(-255,120); break; }   //1000
-       case 12: { DCMotor_Move(-255,255); break; }  //1100
-       case 14: { DCMotor_Move(255,80); break; }  //1110
-       case 16: { DCMotor_Move(0,0); break;}  //1111
+       case 9: { DCMotor_Move(-255,255); break;}  //1001
+       case 12: { DCMotor_Move(-120,255); break; }  //1100
+       case 14: { DCMotor_Move(0,255); break; }  //1110
+       case 15: { DCMotor_Move(255,255); break;}  //1111
        default:
           break;
     }
+    if(Serial.available())
+      mode=Serial.read();
+    if(mode != 0x01 && mode != 0x02) break;
     }
+    return;
 }
 //DCMotor_Move(左轮，右轮);
 //左轮 -为正转 +为反转
@@ -231,6 +239,7 @@ void Avoiding()
     SG901.write(angle); // 转至指定位置
     delay(50);            // 延时15s
   }
+  return;
 }
 //现在只写了一下舵机的驱动
 /****************************************超声避障函数****************************************/
@@ -239,24 +248,21 @@ void Avoiding()
 
 
 /****************************************模式选取函数****************************************/
-uint8_t mode;
+
 
 void loop()
-{
-
-     
+{   
   mode = Serial.read();
-  if(mode == 0x01)
+  if(mode == 0x01 || mode == 0x02)
   {
       line_tracking();
-    }
-    if(mode == 0x0E)
-    {
+   }
+   if(mode == 0x0E || mode == 0x0F)
+   {
       BTControl();
-    }
-    if(mode == 0x0C)
-    {
+   }
+   if(mode == 0x0C || mode == 0x0D)
+   {
       Avoiding();
-    }  
-  
+   }  
 }
