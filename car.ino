@@ -210,6 +210,7 @@ void line_tracking(){
        default:
           break;
     }
+ //   if(Serial.available()>0) break;
     }
 }
 //DCMotor_Move(左轮，右轮);
@@ -222,6 +223,8 @@ void Avoiding()
 {
   uint8_t angle = 0;
   Serial.println("I AM AVOIDING!");
+  while(1)
+  {
     for (angle = 0; angle <= 180; angle += 5) //从50°转至180°
   {
     SG901.write(angle);  // 转至指定位置
@@ -231,7 +234,9 @@ void Avoiding()
   for (angle = 180; angle >= 0; angle -= 5) //从180°转至50°
   {
     SG901.write(angle); // 转至指定位置
-    delay(50);            // 延时15s
+    delay(30);            // 延时15s
+  }
+  if(Serial.available()>0) break;
   }
 }
 //现在只写了一下舵机的驱动
@@ -242,6 +247,7 @@ void Avoiding()
 void serialEvent(){
   uint8_t mode;
   mode = Serial.read();
+  Serial.println(mode);
   if(mode == 0x01)
   {
     line_tracking();
