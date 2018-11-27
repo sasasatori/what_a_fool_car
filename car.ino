@@ -194,25 +194,37 @@ void line_tracking(){
     while(1)
     {
     int IR_total=IR_Read();
-    Serial.println(IR_total);
+    int PID_FEB = 0;
+    int V_left,V_right;
+    Serial.println(PID_FEB);
     switch (IR_total)
     {
-       case 0: {DCMotor_Move(150,-150); break; }   //0000
-       case 1: { DCMotor_Move(-80,255); break; }   //0001
-       case 2: {DCMotor_Move(-120,255); break;} //0010
-       case 3: { DCMotor_Move(-255,120); break; }   //0011
-       case 4: {DCMotor_Move(-120,255); break;}  //0100
-       case 5: {DCMotor_Move(255,120); break;}  //0101
-       case 6: { DCMotor_Move(-255,255); break; }   //1001
-       case 7: { DCMotor_Move(255,255); break; }   //0111
-       case 8: { DCMotor_Move(-255,120); break; }   //1000
-       case 9: { DCMotor_Move(-255,255); break;}  //1001
-       case 12: { DCMotor_Move(-255,-255); break; }  //1100
-       case 14: { DCMotor_Move(-255,-255); break; }  //1110
-       case 15: { DCMotor_Move(255,-255); break;}  //1111
-       default:
-          break;
+       case 6: { PID_FEB = 0; break; }   //1001
+       case 3: { PID_FEB = -1; break; }   //0011
+       case 7: { PID_FEB = -3; break; }   //0111
+       case 1: { PID_FEB = -3; break; }   //0001
+       
+       
+       case 8: { PID_FEB = 3; break; }   //1000
+       case 12: { PID_FEB =  1; break; }  //1100       
+       case 14:{ PID_FEB =  3; break; }  //1110
+ //      case 0:{DCMotor_Move(255,-255);delay(10);break;}
+       default:{break;}
+          
     }
+    V_left = -PID_FEB*250  - 230;
+    V_right = -PID_FEB*250 + 230;
+    
+    if(V_left > 255)
+    V_left=255;
+    if(V_left < -255)
+    V_left = -255;
+    if(V_right > 255)
+    V_right=255;
+    if(V_right < -255)
+    V_right = -255; 
+    
+    DCMotor_Move(V_left,V_right);
     if(Serial.available())
       mode=Serial.read();
     if(mode != 0x01 && mode != 0x02) break;
@@ -222,6 +234,8 @@ void line_tracking(){
 //DCMotor_Move(左轮，右轮);
 //左轮 -为正转 +为反转
 //右轮 +为正转 -为反转
+//<——左      右——>
+//     -       +
 /****************************************循迹相关函数****************************************/
 
 /****************************************超声避障函数****************************************/
@@ -253,7 +267,7 @@ void Avoiding()
 
 void loop()
 {   
-  mode = Serial.read();
+  /*mode = Serial.read();
   if(mode == 0x01 || mode == 0x02)
   {
       line_tracking();
@@ -265,5 +279,6 @@ void loop()
    if(mode == 0x0C || mode == 0x0D)
    {
       Avoiding();
-   }  
+   }*/
+   line_tracking();  
 }
